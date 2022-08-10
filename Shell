@@ -1,0 +1,236 @@
+import os
+import contextlib
+import sys
+
+print("                                                 IFT510: Lab 1 assigment                                       ")
+print("                                                 Subhashini's CLI code                                          ")                                         #Based on code provided by Dr. De Luca                                ")
+print("______________________________________________________________________________________________________________ ")
+
+#Based on code provided by Dr.De Luca in class
+#Code worked without any errors on Windows 11 and PyCharm terminal
+def run_environ():
+    contents = os.environ
+    for content in contents:
+        print(content)
+
+
+def run_dir(p):
+    # p: str = input()
+    if os.path.exists(p):
+        contents = os.listdir(p)
+        for content in contents:
+            print(content)
+    else:
+        print("ERROR: Directory does not exist. Try again!")
+
+
+def run_cd(path):
+    if os.path.exists(path):
+        os.chdir(path)
+    else:
+        print("ERROR: Directory does not exist. Try again!")
+
+
+def run_ls():
+    contents = os.listdir()
+    for content in contents:
+        print(content)
+
+
+def run_clr():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def run_help():
+    print("cd - change the current default directory to specified directory.")
+    print("clr - clears the screen")
+    print("dir - lists the contents of directory")
+    print("environ - lists all the environment strings")
+    print("echo - displays comment on the display followed by a new line")
+    print("help - display a list of all commands and their inputs/behaviors")
+    print("pause - pause operation of the shell until 'Enter' is pressed")
+    print("quit - quits the Subhahini's magical shell")
+    print(
+        ">-outputs the result of the command to the specified file and the outputfile is created if it does not exist and truncated if it does")
+    print(">>-the outputfile is created if it does not exist and appended to if it does.")
+
+
+#Output redirection and appending works for help,cd,dir,environ and echo.
+
+
+
+while True:
+    cwd = os.getcwd()
+    path = cwd
+
+    command = input(cwd + ">")
+    cmd_array = command.split()
+
+    if command == "quit":
+        break
+    ###############################################################################################################
+    elif cmd_array[0] == "ls":
+        if len(cmd_array) == 1:
+            run_ls()
+        # for i in range(len(cmd_array)):
+        #   cmd_array[i]
+        elif cmd_array[1] == ">" or cmd_array[1] == ">>":
+            original = sys.stdout
+            if cmd_array[1] == ">":
+                sys.stdout = open(cmd_array[2], "w")
+            else:
+                sys.stdout = open(cmd_array[2], "a")
+            run_ls()
+            sys.stdout.close()
+            sys.stdout = original
+    ###############################################################################################################
+    elif command == "clr":
+        run_clr()
+    ###############################################################################################################
+    elif cmd_array[0] == "cd":
+        for i in range(len(cmd_array)):
+            if len(cmd_array) == 1:
+                pathname = os.getcwd()
+                run_cd(pathname)
+                print("Current Directory is:\n", os.getcwd())  # works for cd > file in directory
+            else:
+                if i >= 1 and ">" not in cmd_array and ">>" not in cmd_array:
+                    run_cd(cmd_array[1])
+
+                elif i >= 1 and ">" in cmd_array:
+                    cmd_array[0] = ''
+                    original = sys.stdout
+                    stor = ' '.join(cmd_array)
+                    x: list[str, str, str] = stor.partition(">")
+                    if cmd_array[1] == ">":
+                        pathname = os.getcwd()
+                    else:
+                        pathname = cmd_array[1]
+                    sys.stdout = open(x[2].strip(), "w")
+                    run_cd(pathname)
+                    print(pathname)
+                    sys.stdout.close()
+                    sys.stdout = original
+
+                elif i >= 1 and ">>" in cmd_array[i]:
+                    cmd_array[0] = ' '
+                    original = sys.stdout
+                    stor = ' '.join(cmd_array)
+                    x: list[str, str, str] = stor.partition(">>")
+                    if cmd_array[1] == ">>":
+                        pathname = os.getcwd()
+                    else:
+                        pathname = cmd_array[1]
+                    sys.stdout = open(x[2].strip(), "a")
+                    run_cd(pathname)
+                    print(pathname)
+                    sys.stdout.close()
+                    sys.stdout = original
+    # ####################################################################################################################
+    elif cmd_array[0] == "environ":
+        if len(cmd_array) == 1:
+            run_environ()
+        # for i in range(len(cmd_array)):
+        #   cmd_array[i]
+        elif cmd_array[1] == ">" or cmd_array[1] == ">>":
+            original = sys.stdout
+            if cmd_array[1] == ">":
+                sys.stdout = open(cmd_array[2], "w")
+            else:
+                sys.stdout = open(cmd_array[2], "a")
+            run_environ()
+            sys.stdout.close()
+            sys.stdout = original
+    # ####################################################################################################################
+    elif cmd_array[0] == "echo":
+        # print(cmd_array[1])
+        for i in range(len(cmd_array)):
+            if len(cmd_array) == 1:
+                print("echo is on")
+                print("\n")
+
+            else:                          #Output redirection and appending works in format echo (anycomment) > some file or echo (comment) >> file
+                if i >= 1 and ">" not in cmd_array and ">>" not in cmd_array:
+                    cmd_array[0] = ''
+                    stor = ' '.join(cmd_array)
+                    if i == len(cmd_array) - 1:
+                        print(stor)
+                        print("\n")
+
+                elif i >= 1 and ">" in cmd_array:
+                    cmd_array[0] = ''
+                    original = sys.stdout
+                    stor = ' '.join(cmd_array)
+                    x: list[str, str, str] = stor.partition(">")
+                    sys.stdout = open(x[2].strip(), "w")
+                    print(x[0])
+                    sys.stdout.close()
+                    sys.stdout = original
+
+                elif i >= 1 and ">>" in cmd_array[i]:
+                    cmd_array[0] = ' '
+                    original = sys.stdout
+                    stor = ' '.join(cmd_array)
+                    x: list[str, str, str] = stor.partition(">>")
+                    sys.stdout = open(x[2].strip(), "a")
+                    print(x[0])
+                    sys.stdout.close()
+                    sys.stdout = original
+    # ####################################################################################################################
+    elif cmd_array[0] == "dir":
+        # print(cmd_array[1])
+        for i in range(len(cmd_array)):
+            if len(cmd_array) == 1:
+                pathname = os.getcwd()
+                run_dir(pathname)                #dir output redirection and appending prints dir > file and also dir (directory) > file
+            else:
+                if i >= 1 and ">" not in cmd_array and ">>" not in cmd_array:
+                    run_dir(cmd_array[1])
+
+                elif i >= 1 and ">" in cmd_array:
+                    cmd_array[0] = ''
+                    original = sys.stdout
+                    stor = ' '.join(cmd_array)
+                    x: list[str, str, str] = stor.partition(">")
+                    if cmd_array[1] == ">":
+                        pathname = os.getcwd()
+                    else:
+                        pathname = cmd_array[1]
+                    sys.stdout = open(x[2].strip(), "w")
+                    run_dir(pathname)
+                    sys.stdout.close()
+                    sys.stdout = original
+
+                elif i >= 1 and ">>" in cmd_array[i]:
+                    cmd_array[0] = ' '
+                    original = sys.stdout
+                    stor = ' '.join(cmd_array)
+                    x: list[str, str, str] = stor.partition(">>")
+                    if cmd_array[1] == ">>":
+                        pathname = os.getcwd()
+                    else:
+                        pathname = cmd_array[1]
+                    sys.stdout = open(x[2].strip(), "a")
+                    run_dir(pathname)
+                    sys.stdout.close()
+                    sys.stdout = original
+    ############################################################################################################
+    elif cmd_array[0] == "help":
+        if len(cmd_array) == 1:
+            run_help()
+        elif cmd_array[1] == ">" or cmd_array[1] == ">>":
+            original = sys.stdout
+            if cmd_array[1] == ">":
+                sys.stdout = open(cmd_array[2], "w")
+            else:
+                sys.stdout = open(cmd_array[2], "a")
+            run_help()
+            sys.stdout.close()
+
+            sys.stdout = original
+    ###########################################################################################################
+    elif command == "pause":
+        input("Press ENTER to continue")
+    else:
+        print(
+            "'" + command + "' is not recognized as an internal or external command, operable program or batch file.\n")
