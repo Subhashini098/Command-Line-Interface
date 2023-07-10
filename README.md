@@ -2,7 +2,7 @@
 CLI created in Python.
 
 The command it supports
-1. cd<directory>- change the current default directory to <directory>
+1.cd<directory>- change the current default directory to <directory>
 
 2.clr-clear the screen
 
